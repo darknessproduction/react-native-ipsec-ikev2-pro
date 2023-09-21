@@ -3,20 +3,21 @@ require "json"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
 Pod::Spec.new do |s|
-  s.name         = "react-native-ip-sec-vpn"
+  s.name         = "react-native-ipsec-ikev2-pro"
   s.version      = package["version"]
   s.summary      = package["description"]
   s.description  = <<-DESC
-                  react-native-ip-sec-vpn
+                  react-native-ipsec-ikev2-pro
                    DESC
-  s.homepage     = "https://github.com/github_account/react-native-ip-sec-vpn"
+  s.homepage     = "https://github.com/darknessproduction/react-native-ipsec-ikev2-pro"
   # brief license entry:
   s.license      = "MIT"
   # optional - use expanded license entry instead:
   # s.license    = { :type => "MIT", :file => "LICENSE" }
-  s.authors      = { "Your Name" => "sinajavaheri@email.com" }
+  # sinajavaheri@email.com
+  s.authors      = { "Your Name" => "ilya@sarzhevsky.com" }
   s.platforms    = { :ios => "9.0" }
-  s.source       = { :git => "https://github.com/sijav/react-native-ip-sec-vpn.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/darknessproduction/react-native-ipsec-ikev2-pro.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,c,m,swift}"
   s.requires_arc = true
