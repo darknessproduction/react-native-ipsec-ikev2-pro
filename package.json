@@ -13,7 +13,7 @@
     "index.ts",
     "index.d.ts",
     "ios",
-    "react-native-ip-sec-vpn.podspec"
+    "react-native-ipsec-ikev2-pro.podspec"
   ],
   "scripts": {
     "prepare": "yarn run compile",
