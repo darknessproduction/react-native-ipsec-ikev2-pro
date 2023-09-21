@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   # s.license    = { :type => "MIT", :file => "LICENSE" }
   # sinajavaheri@email.com
   s.authors      = { "Your Name" => "ilya@sarzhevsky.com" }
-  s.platforms    = { :ios => "9.0" }
+  s.platforms    = { :ios => "10.0" }
   s.source       = { :git => "https://github.com/darknessproduction/react-native-ipsec-ikev2-pro.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,c,m,swift}"
