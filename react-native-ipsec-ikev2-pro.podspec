@@ -10,19 +10,11 @@ Pod::Spec.new do |s|
                   react-native-ipsec-ikev2-pro
                    DESC
   s.homepage     = "https://github.com/darknessproduction/react-native-ipsec-ikev2-pro"
-  # brief license entry:
   s.license      = "MIT"
-  # optional - use expanded license entry instead:
-  # s.license    = { :type => "MIT", :file => "LICENSE" }
-  # sinajavaheri@email.com
-  s.authors      = { "Your Name" => "ilya@sarzhevsky.com" }
+  s.authors      = { "sinajavaheri" => "ilya@sarzhevsky.com" }
   s.platforms    = { :ios => "10.0" }
-  s.source       = { :git => "https://github.com/darknessproduction/react-native-ipsec-ikev2-pro.git", :tag => "#{s.version}" }
-
+  s.source       = { :git => "https://github.com/darknessproduction/react-native-ipsec-ikev2-pro", :tag => "#{s.version}" }
   s.source_files = "ios/**/*.{h,c,m,swift}"
   s.requires_arc = true
-
   s.dependency "React"
-  # ...
-  # s.dependency "..."
 end
