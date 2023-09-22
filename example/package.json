@@ -10,7 +10,7 @@
   "dependencies": {
     "react": "16.13.1",
     "react-native": "0.63.2",
-    "react-native-ipsec-ikev2-pro": "1.1.15"
+    "react-native-ipsec-ikev2-pro": "1.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
