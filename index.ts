@@ -79,8 +79,8 @@ export const connect: (name: string, address: string, username: string, password
   mtu,
   b64CaCert,
   b64UserCert,
-  certAlias,
   userCertPassword,
+  certAlias,
 ) => NativeModules.RNIpSecVpn.connect(name || "", address || "", username || "", password || "", vpnType || "", secret || "", disconnectOnSleep || false, mtu || 1400, b64CaCert || "", b64UserCert || "", userCertPassword || "", certAlias || "");
 
 // get current state
