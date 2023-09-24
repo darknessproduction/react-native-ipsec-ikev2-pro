@@ -1,98 +1,40 @@
-import { NativeEventEmitter, NativeModules, EmitterSubscription } from "react-native";
-
-// the generic VPN state for all platforms.
-export enum VpnState {
-  disconnected,
-  connecting,
-  connected,
-  disconnecting,
-  genericError,
+import { EmitterSubscription } from "react-native";
+export declare enum VpnState {
+    disconnected = 0,
+    connecting = 1,
+    connected = 2,
+    disconnecting = 3,
+    genericError = 4
 }
-
-/// the error state from `VpnStateService`.
-/// only available for Android device.
-export enum CharonErrorState {
-  NO_ERROR,
-  AUTH_FAILED,
-  PEER_AUTH_FAILED,
-  LOOKUP_FAILED,
-  UNREACHABLE,
-  GENERIC_ERROR,
-  PASSWORD_MISSING,
-  CERTIFICATE_UNAVAILABLE,
-  UNDEFINED,
+export declare enum CharonErrorState {
+    NO_ERROR = 0,
+    AUTH_FAILED = 1,
+    PEER_AUTH_FAILED = 2,
+    LOOKUP_FAILED = 3,
+    UNREACHABLE = 4,
+    GENERIC_ERROR = 5,
+    PASSWORD_MISSING = 6,
+    CERTIFICATE_UNAVAILABLE = 7,
+    UNDEFINED = 8
 }
-
-const stateChanged: NativeEventEmitter = new NativeEventEmitter(NativeModules.RNIpSecVpn);
-
-// receive state change from VPN service.
-export const STATE_CHANGED_EVENT_NAME: string = "stateChanged";
-
-// remove change listener
-export const removeOnStateChangeListener: (stateChangedEvent: EmitterSubscription) => void = (stateChangedEvent) => {
-  stateChangedEvent.remove();
-};
-
-// set a change listener
-export const onStateChangedListener: (
-  callback: (state: { state: VpnState; charonState: CharonErrorState }) => void
-) => EmitterSubscription = (callback) => {
-  return stateChanged.addListener(STATE_CHANGED_EVENT_NAME, (e: { state: VpnState; charonState: CharonErrorState }) => callback(e));
-};
-
-// prepare for vpn connection.
-//
-// android:
-//   for first connection it will show a dialog to ask for permission.
-//   when your connection was interrupted by another VPN connection,
-//   you should prepare again before reconnect.
-//   also if activity isn't running yet,
-//   the activity can be null and will raise an exception
-//   in this case prepare should be called once again when the activity is running.
-//
-// ios:
-//   create a watch for state change
-//   does not raise anything
-export const prepare: () => Promise<void> = NativeModules.RNIpSecVpn.prepare;
-
-export enum VpnType {
-  IKEV2_EAP = "ikev2-eap",
+export declare const STATE_CHANGED_EVENT_NAME: string;
+export declare const removeOnStateChangeListener: (stateChangedEvent: EmitterSubscription) => void;
+export declare const onStateChangedListener: (callback: (state: {
+    state: VpnState;
+    charonState: CharonErrorState;
+}) => void) => EmitterSubscription;
+export declare const prepare: () => Promise<void>;
+export declare enum VpnType {
+    IKEV2_EAP = "ikev2-eap",
     IKEV2_CERT = "ikev2-cert",
     IKEV2_CERT_EAP = "ikev2-cert-eap",
     IKEV2_EAP_TLS = "ikev2-eap-tls",
-    IKEV2_BYOD_EAP = "ikev2-byod-eap",
+    IKEV2_BYOD_EAP = "ikev2-byod-eap"
 }
-
-// connect to VPN.
-//
-// use given credentials to connect VPN (ikev2-eap).
-// this will create a background VPN service.
-// mtu is only available on android.
-export const connect: (name: string, address: string, username: string, password: string, vpnType?: VpnType, secret?: string, disconnectOnSleep?: boolean, mtu?: number, b64CaCert?: string, b64UserCert?: string, userCertPassword?: string, certAlias?: string) => Promise<void> = (
-  name,
-  address,
-  username,
-  password,
-  vpnType,
-  secret,
-  disconnectOnSleep,
-  mtu,
-  b64CaCert,
-  b64UserCert,
-  userCertPassword,
-  certAlias,
-) => NativeModules.RNIpSecVpn.connect(name || "", address || "", username || "", password || "", vpnType || "", secret || "", disconnectOnSleep || false, mtu || 1400, b64CaCert || "", b64UserCert || "", userCertPassword || "", certAlias || "");
-
-// get current state
-export const getCurrentState: () => Promise<VpnState> = NativeModules.RNIpSecVpn.getCurrentState;
-
-// get current error state from `VpnStateService`. (Android only will recieve no error on ios)
-// when [VpnState.genericError] is receivedon android, details of error can be
-// inspected by [CharonErrorState].
-export const getCharonErrorState: () => Promise<CharonErrorState> = NativeModules.RNIpSecVpn.getCharonErrorState;
-
-// disconnect and stop VPN service.
-// does not raise any exception
-export const disconnect: () => Promise<void> = NativeModules.RNIpSecVpn.disconnect;
-
-export default NativeModules.RNIpSecVpn;
+export declare const connect: (name: string, address: string, username: string, password: string, vpnType?: VpnType, secret?: string, disconnectOnSleep?: boolean, mtu?: number, b64CaCert?: string, b64UserCert?: string, userCertPassword?: string, certAlias?: string) => Promise<void>;
+export declare const getCurrentState: () => Promise<VpnState>;
+export declare const getCharonErrorState: () => Promise<CharonErrorState>;
+export declare const disconnect: () => Promise<void>;
+export declare const connectToVPN: (name: string, address: string, username: string, password: string, vpnType?: VpnType, secret?: string, disconnectOnSleep?: boolean, mtu?: number, b64CaCert?: string, b64UserCert?: string, userCertPassword?: string, certAlias?: string) => Promise<void>;
+declare const _default: any;
+export default _default;

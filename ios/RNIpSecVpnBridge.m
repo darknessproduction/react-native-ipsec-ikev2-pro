@@ -15,5 +15,8 @@ RCT_EXTERN_METHOD(connect:(NSString *)name address:(NSString *)address username:
 RCT_EXTERN_METHOD(disconnect:(RCTPromiseResolveBlock)findEventsWithResolver rejecter:(RCTPromiseRejectBlock)rejecter)
 RCT_EXTERN_METHOD(getCurrentState:(RCTPromiseResolveBlock)findEventsWithResolver rejecter:(RCTPromiseRejectBlock)rejecter)
 RCT_EXTERN_METHOD(getCharonErrorState:(RCTPromiseResolveBlock)findEventsWithResolver rejecter:(RCTPromiseRejectBlock)rejecter)
+RCT_EXTERN_METHOD(createVPNProfile:(RCTPromiseResolveBlock)findEventsWithResolver rejecter:(RCTPromiseRejectBlock)rejecter)
+RCT_EXTERN_METHOD(connectToVPN:(NSString *)name address:(NSString *)address username:(NSString *)username password:(NSString *)password vpnType:(NSString *)vpnType secret:(NSString *)secret disconnectOnSleep:(BOOL)disconnectOnSleep mtu:(NSNumber *_Nonnull)mtu b64CaCert:(NSString *)b64CaCert b64UserCert:(NSString *)b64UserCert userCertPassword:(NSString *)userCertPassword certAlias:(NSString *)certAlias findEventsWithResolver:(RCTPromiseResolveBlock)findEventsWithResolver rejecter:(RCTPromiseRejectBlock)rejecter)
+RCT_EXTERN_METHOD(disconnectFromVPN:(RCTPromiseResolveBlock)findEventsWithResolver rejecter:(RCTPromiseRejectBlock)rejecter)
 
 @end
