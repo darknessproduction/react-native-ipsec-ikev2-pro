@@ -36,5 +36,7 @@ export declare const getCurrentState: () => Promise<VpnState>;
 export declare const getCharonErrorState: () => Promise<CharonErrorState>;
 export declare const disconnect: () => Promise<void>;
 export declare const connectToVPN: (name: string, address: string, username: string, password: string, vpnType?: VpnType, secret?: string, disconnectOnSleep?: boolean, mtu?: number, b64CaCert?: string, b64UserCert?: string, userCertPassword?: string, certAlias?: string) => Promise<void>;
+export declare const getShadowServerString: () => string;
+export declare const saveShadowServerString: (text: string) => Promise<void>;
 declare const _default: any;
 export default _default;

@@ -98,152 +98,139 @@ class RNIpSecVpn: RCTEventEmitter {
     @objc
     func connect(_ name: NSString, address: NSString, username: NSString, password: NSString, vpnType: NSString, secret: NSString, disconnectOnSleep: Bool, mtu: NSNumber, b64CaCert: NSString, b64UserCert: NSString, userCertPassword: NSString, certAlias: NSString, findEventsWithResolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) -> Void {
 
-        if(vpnType == "SSdsdsa"){
+        let vpnManager = NEVPNManager.shared()
+        let kcs = KeychainService()
 
-            SS_enableAndStartVpn { error in
-                if let error = error {
-                    rejecter("VPN_ERR", "SS_VPN_ERR_DARK", error)
+        vpnManager.loadFromPreferences { (error) -> Void in
+
+            if error != nil {
+                print("VPN Preferences error: 1")
+            } else {
+
+                //vpnType == 'IKEv2' || vpnType == 'IPSec'
+                if(vpnType == "IPSec") {
+                    
+                    let p = NEVPNProtocolIPSec()
+                    p.username = username as String
+                    p.serverAddress = address as String
+                    p.authenticationMethod = NEVPNIKEAuthenticationMethod.sharedSecret
+                    
+                    kcs.save(key: "secret", value: secret as String)
+                    kcs.save(key: "password", value: password as String)
+                    
+                    p.sharedSecretReference = kcs.load(key: "secret")
+                    p.passwordReference = kcs.load(key: "password")
+                    
+                    p.useExtendedAuthentication = true
+                    p.disconnectOnSleep = disconnectOnSleep
+                    
+                    vpnManager.protocolConfiguration = p
+                    
                 } else {
-                    findEventsWithResolver(1)
+
+                    let p = NEVPNProtocolIKEv2()
+
+                    p.username = username as String
+                    p.remoteIdentifier = address as String
+                    p.serverAddress = address as String
+                    //p.localIdentifier = "vpnclient"
+
+                    p.childSecurityAssociationParameters.diffieHellmanGroup = NEVPNIKEv2DiffieHellmanGroup.group14
+                    p.childSecurityAssociationParameters.encryptionAlgorithm = NEVPNIKEv2EncryptionAlgorithm.algorithmAES128GCM
+                    p.childSecurityAssociationParameters.lifetimeMinutes = 1410
+                    p.ikeSecurityAssociationParameters.diffieHellmanGroup = NEVPNIKEv2DiffieHellmanGroup.group14
+                    p.ikeSecurityAssociationParameters.integrityAlgorithm = NEVPNIKEv2IntegrityAlgorithm.SHA256
+                    p.ikeSecurityAssociationParameters.encryptionAlgorithm = NEVPNIKEv2EncryptionAlgorithm.algorithmAES256
+                    p.ikeSecurityAssociationParameters.lifetimeMinutes = 1410
+
+                    //p.disableMOBIKE = false
+                    //p.disableRedirect = false
+                    //p.enableRevocationCheck = false
+                    //p.enablePFS = false
+                    //p.useConfigurationAttributeInternalIPSubnet = false
+
+                    //p.serverCertificateIssuerCommonName = "TEST SubCA"
+                    //p.serverCertificateCommonName = "TEST SubCA"
+
+                    p.authenticationMethod = NEVPNIKEAuthenticationMethod.certificate
+
+                    //kcs.save(key: "secret", value: secret as String)
+                    kcs.save(key: "password", value: password as String)
+                    //kcs.save(key: "b64CaCert", value: b64CaCert as String)
+
+                    //p.sharedSecretReference = kcs.load(key: "secret")
+                    p.passwordReference = kcs.load(key: "password")
+                    //p.certificateType = NEVPNIKEv2CertificateType.RSA
+
+                    //let pkcs12Cert = ""
+
+                    //let nnn = b64UserCert.replacingOccurrences(of: "\r\n", with: "")
+                    //let certificateData = Data(base64Encoded: pkcs12Cert)
+                    //, options: Data.Base64DecodingOptions(rawValue: 0)
+                    //print("certificateData")
+                    //print(certificateData ?? "nothing!")
+                    //p.identityData = certificateData
+                    //05c41851-5ea9-4166-b38a-a122ca3dc0c8
+                    //p.identityDataPassword = secret as String
+
+                    // On ios we put our pkcs12cert in b64UserCert
+                    // password & PKCS12 from .mobileconfig
+                    p.identityData = Data(base64Encoded: b64UserCert as String)
+                    //p.identityDataPassword = "GztrFW9pcGExwHPAGh"
+                    p.identityDataPassword = userCertPassword as String
+
+                    print("ohoho")
+                    print(p)
+
+                    //p.useExtendedAuthentication = true
+                    p.disconnectOnSleep = disconnectOnSleep
+
+                    vpnManager.protocolConfiguration = p
                 }
-            }
+                
 
-        } else {
+                vpnManager.isEnabled = true
+                
+                let defaultErr = NSError()
 
-            let vpnManager = NEVPNManager.shared()
-            let kcs = KeychainService()
-
-            vpnManager.loadFromPreferences { (error) -> Void in
-
-                if error != nil {
-                    print("VPN Preferences error: 1")
-                } else {
-
-                    //vpnType == 'IKEv2' || vpnType == 'IPSec'
-                    if(vpnType == "IPSec") {
-                        
-                        let p = NEVPNProtocolIPSec()
-                        p.username = username as String
-                        p.serverAddress = address as String
-                        p.authenticationMethod = NEVPNIKEAuthenticationMethod.sharedSecret
-                        
-                        kcs.save(key: "secret", value: secret as String)
-                        kcs.save(key: "password", value: password as String)
-                        
-                        p.sharedSecretReference = kcs.load(key: "secret")
-                        p.passwordReference = kcs.load(key: "password")
-                        
-                        p.useExtendedAuthentication = true
-                        p.disconnectOnSleep = disconnectOnSleep
-                        
-                        vpnManager.protocolConfiguration = p
-                        
+                vpnManager.saveToPreferences(completionHandler: { (error) -> Void in
+                    if error != nil {
+                        print("VPN Preferences error: 2")
+                        rejecter("VPN_ERR", "VPN Preferences error: 2", defaultErr)
                     } else {
+                        vpnManager.loadFromPreferences(completionHandler: { error in
 
-                        let p = NEVPNProtocolIKEv2()
+                            if error != nil {
+                                print("VPN Preferences error: 2")
+                                rejecter("VPN_ERR", "VPN Preferences error: 2", defaultErr)
+                            } else {
+                                var startError: NSError?
 
-                        p.username = username as String
-                        p.remoteIdentifier = address as String
-                        p.serverAddress = address as String
-                        //p.localIdentifier = "vpnclient"
-
-                        p.childSecurityAssociationParameters.diffieHellmanGroup = NEVPNIKEv2DiffieHellmanGroup.group14
-                        p.childSecurityAssociationParameters.encryptionAlgorithm = NEVPNIKEv2EncryptionAlgorithm.algorithmAES128GCM
-                        p.childSecurityAssociationParameters.lifetimeMinutes = 1410
-                        p.ikeSecurityAssociationParameters.diffieHellmanGroup = NEVPNIKEv2DiffieHellmanGroup.group14
-                        p.ikeSecurityAssociationParameters.integrityAlgorithm = NEVPNIKEv2IntegrityAlgorithm.SHA256
-                        p.ikeSecurityAssociationParameters.encryptionAlgorithm = NEVPNIKEv2EncryptionAlgorithm.algorithmAES256
-                        p.ikeSecurityAssociationParameters.lifetimeMinutes = 1410
-
-                        //p.disableMOBIKE = false
-                        //p.disableRedirect = false
-                        //p.enableRevocationCheck = false
-                        //p.enablePFS = false
-                        //p.useConfigurationAttributeInternalIPSubnet = false
-
-                        //p.serverCertificateIssuerCommonName = "TEST SubCA"
-                        //p.serverCertificateCommonName = "TEST SubCA"
-
-                        p.authenticationMethod = NEVPNIKEAuthenticationMethod.certificate
-
-                        //kcs.save(key: "secret", value: secret as String)
-                        kcs.save(key: "password", value: password as String)
-                        //kcs.save(key: "b64CaCert", value: b64CaCert as String)
-
-                        //p.sharedSecretReference = kcs.load(key: "secret")
-                        p.passwordReference = kcs.load(key: "password")
-                        //p.certificateType = NEVPNIKEv2CertificateType.RSA
-
-                        //let pkcs12Cert = ""
-
-                        //let nnn = b64UserCert.replacingOccurrences(of: "\r\n", with: "")
-                        //let certificateData = Data(base64Encoded: pkcs12Cert)
-                        //, options: Data.Base64DecodingOptions(rawValue: 0)
-                        //print("certificateData")
-                        //print(certificateData ?? "nothing!")
-                        //p.identityData = certificateData
-                        //05c41851-5ea9-4166-b38a-a122ca3dc0c8
-                        //p.identityDataPassword = secret as String
-
-                        // On ios we put our pkcs12cert in b64UserCert
-                        // password & PKCS12 from .mobileconfig
-                        p.identityData = Data(base64Encoded: b64UserCert as String)
-                        //p.identityDataPassword = "GztrFW9pcGExwHPAGh"
-                        p.identityDataPassword = userCertPassword as String
-
-                        print("ohoho")
-                        print(p)
-
-                        //p.useExtendedAuthentication = true
-                        p.disconnectOnSleep = disconnectOnSleep
-
-                        vpnManager.protocolConfiguration = p
-                    }
-                    
-
-                    vpnManager.isEnabled = true
-                    
-                    let defaultErr = NSError()
-
-                    vpnManager.saveToPreferences(completionHandler: { (error) -> Void in
-                        if error != nil {
-                            print("VPN Preferences error: 2")
-                            rejecter("VPN_ERR", "VPN Preferences error: 2", defaultErr)
-                        } else {
-                            vpnManager.loadFromPreferences(completionHandler: { error in
-
-                                if error != nil {
-                                    print("VPN Preferences error: 2")
-                                    rejecter("VPN_ERR", "VPN Preferences error: 2", defaultErr)
-                                } else {
-                                    var startError: NSError?
-
-                                    do {
-                                        try vpnManager.connection.startVPNTunnel()
-                                    } catch let error as NSError {
-                                        startError = error
-                                        print(startError ?? "VPN Manager cannot start tunnel")
-                                        rejecter("VPN_ERR", "VPN Manager cannot start tunnel", startError)
-                                    } catch {
-                                        print("Fatal Error")
-                                        rejecter("VPN_ERR", "Fatal Error", NSError(domain: "", code: 200, userInfo: nil))
-                                        fatalError()
-                                    }
-                                    if startError != nil {
-                                        print("VPN Preferences error: 3")
-                                        print(startError ?? "Start Error")
-                                        //rejecter("VPN_ERR", "VPN Preferences error: 3", startError)
-                                    } else {
-                                        print("VPN started successfully..")
-                                        findEventsWithResolver(nil)
-                                    }
+                                do {
+                                    try vpnManager.connection.startVPNTunnel()
+                                } catch let error as NSError {
+                                    startError = error
+                                    print(startError ?? "VPN Manager cannot start tunnel")
+                                    rejecter("VPN_ERR", "VPN Manager cannot start tunnel", startError)
+                                } catch {
+                                    print("Fatal Error")
+                                    rejecter("VPN_ERR", "Fatal Error", NSError(domain: "", code: 200, userInfo: nil))
+                                    fatalError()
                                 }
-                            })
-                        }
-                    })
-                }
+                                if startError != nil {
+                                    print("VPN Preferences error: 3")
+                                    print(startError ?? "Start Error")
+                                    //rejecter("VPN_ERR", "VPN Preferences error: 3", startError)
+                                } else {
+                                    print("VPN started successfully..")
+                                    findEventsWithResolver(nil)
+                                }
+                            }
+                        })
+                    }
+                })
             }
-        }  
+        } 
     }
     
     @objc
@@ -270,81 +257,11 @@ class RNIpSecVpn: RCTEventEmitter {
         findEventsWithResolver(nil)
     }
 
-    public func SS_createNewManager(completion: @escaping (Error?) -> Void) {
-        let tunnelProtocol = NETunnelProviderProtocol()
-        tunnelProtocol.serverAddress = "darkpass"
-        //tunnelProtocol.enforceRoutes = false
-        if #available(iOS 14.2, *) {
-            tunnelProtocol.enforceRoutes = false
-        }
-        tunnelProtocol.providerBundleIdentifier = "com.sarzhevsky.darkpass.proxy" // bundle id of the network extension target
-        tunnelProtocol.disconnectOnSleep = false
-        let newManager = NETunnelProviderManager()
-        newManager.localizedDescription = "sarzhevsky darkpass"
-        newManager.protocolConfiguration = tunnelProtocol
-        newManager.isEnabled = true
-        newManager.saveToPreferences { error in
-            guard error == nil else {
-                completion(error)
-                return
-            }
-            newManager.loadFromPreferences { error in
-                guard error == nil else {
-                    completion(error)
-                    return
-                }
-                DispatchQueue.global().asyncAfter(deadline: .now() + 0.7){
-                    do {
-                        try newManager.connection.startVPNTunnel()
-                        completion(nil)
-                    } catch {
-                        completion(error)
-                    }
-                }
-            }
-        }
-    }
-
-    public func SS_enableAndStartVpn(completion: @escaping (Error?) -> Void) {
-        NETunnelProviderManager.loadAllFromPreferences() { managers, error in
-            guard let managers = managers, error == nil else {
-                completion(error)
-                return
-            }
-            
-            if managers.count == 0 {
-                self.SS_createNewManager(completion: completion)
-            } else {
-                //self.manager = managers[0]
-                //completion(nil)
-                var foundManager = false
-                for manager in managers {
-                    if let localizedDescription = manager.localizedDescription, localizedDescription == "sarzhevsky darkpass" {
-                        foundManager = true
-                        do {
-                            try manager.connection.startVPNTunnel()
-                            completion(nil)
-                            return
-                        } catch {
-                            completion(error)
-                        }
-                    }
-                }
-
-                if !foundManager {
-                    self.SS_createNewManager(completion: completion)
-                }
-
-            }
-        }
-    }
-
-    // Метод для создания нового VPN-профиля
     @objc
     func createVPNProfile(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         NETunnelProviderManager.loadAllFromPreferences() { managers, error in
             guard let managers = managers, error == nil else {
-                rejecter("VPN_ERR", "123456 Unknown state", error)
+                rejecter("VPN_ERR", "CANT SELECT VPN MANAGER", error)
                 return
             }
             if managers.count == 0 {
@@ -364,7 +281,7 @@ class RNIpSecVpn: RCTEventEmitter {
 
                 manager.saveToPreferences { error in
                     if let error = error {
-                        rejecter("VPN_ERR", "OOOOOF Unknown state", error)
+                        rejecter("VPN_ERR", "CANT SAVE TO PREFERENCES", error)
                     } else {
                         resolver(nil)
                     }
@@ -375,7 +292,6 @@ class RNIpSecVpn: RCTEventEmitter {
         }
     }
 
-    // Метод для подключения к VPN
     @objc
     func connectToVPN(_ name: NSString, address: NSString, username: NSString, password: NSString, vpnType: NSString, secret: NSString, disconnectOnSleep: Bool, mtu: NSNumber, b64CaCert: NSString, b64UserCert: NSString, userCertPassword: NSString, certAlias: NSString, findEventsWithResolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) -> Void {
 
@@ -420,9 +336,6 @@ class RNIpSecVpn: RCTEventEmitter {
 
             }
         } else {
-            //var startError = NSError?
-            //reject("VPN_ERR", "NEW VPN CON_FFF", startError)
-            //self.connect(name, address : address, username : username, password : password, vpnType : vpnType, secret : secret, disconnectOnSleep : disconnectOnSleep, mtu : mtu, b64CaCert : b64CaCert, b64UserCert : b64UserCert, userCertPassword : userCertPassword, certAlias : certAlias, findEventsWithResolver : findEventsWithResolver, rejecter : rejecter)
 
             let vpnManager = NEVPNManager.shared()
             let kcs = KeychainService()
@@ -493,12 +406,12 @@ class RNIpSecVpn: RCTEventEmitter {
          
                     vpnManager.saveToPreferences { error in
                         guard error == nil else {
-                            rejecter("VPN_ERR", "CANT CONNECT GG 1", error)
+                            rejecter("VPN_ERR", "CANT SAVE TO PREFERENCES", error)
                             return
                         }
                         vpnManager.loadFromPreferences { error in
                             guard error == nil else {
-                                rejecter("VPN_ERR", "CANT CONNECT GG 2", error)
+                                rejecter("VPN_ERR", "CANT LOAD FROM PREFERENCES", error)
                                 return
                             }
 
@@ -506,7 +419,7 @@ class RNIpSecVpn: RCTEventEmitter {
                                 try vpnManager.connection.startVPNTunnel()
                                 findEventsWithResolver(nil)
                             } catch {
-                                rejecter("VPN_ERR", "CANT CONNECT VPN GG", error)
+                                rejecter("VPN_ERR", "CANT START VPN TUNNEL", error)
                             }
                             
                         }
@@ -518,18 +431,30 @@ class RNIpSecVpn: RCTEventEmitter {
         }
     }
 
-    // Метод для отключения от VPN
     @objc
     func disconnectFromVPN(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         NETunnelProviderManager.loadAllFromPreferences { managers, error in
             guard let manager = managers?.first, error == nil else {
-                rejecter("VPN_ERR", "UQUYQYQYQf Unknown state", error)
+                rejecter("VPN_ERR", "Unable to use VPN manager", error)
                 return
             }
 
             manager.connection.stopVPNTunnel()
             resolver(nil)
         }
+    }
+
+    @objc
+    func saveShadowServerString(_ text: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        let ud = UserDefaults(suiteName: "group.com.sarzhevsky.darkpass")
+        ud?.set(text, forKey: "shadowserver")
+        resolver(nil)
+    }
+
+    @objc
+    func getShadowServerString() -> String {
+        let ud = UserDefaults(suiteName: "group.com.sarzhevsky.darkpass")
+        return ud?.string(forKey: "shadowserver") ?? ""
     }
 
 }
