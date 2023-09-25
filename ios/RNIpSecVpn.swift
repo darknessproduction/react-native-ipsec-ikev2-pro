@@ -452,9 +452,24 @@ class RNIpSecVpn: RCTEventEmitter {
     }
 
     @objc
-    func getShadowServerString() -> String {
+    func getShadowServerString(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         let ud = UserDefaults(suiteName: "group.com.sarzhevsky.darkpass")
-        return ud?.string(forKey: "shadowserver") ?? ""
+        let val = ud?.string(forKey: "shadowserver") ?? ""
+        resolver(val)
+    }
+
+    @objc
+    func getShadowType(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        let ud = UserDefaults(suiteName: "group.com.sarzhevsky.darkpass")
+        let val = ud?.integer(forKey: "type") ?? 0
+        resolver(val)
+    }
+
+    @objc
+    func saveShadowType(_ type: Int, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        let ud = UserDefaults(suiteName: "group.com.sarzhevsky.darkpass")
+        ud?.set(type, forKey: "type")
+        resolver(nil)
     }
 
 }

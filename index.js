@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.disconnect = exports.getShadowServerString = exports.saveShadowServerString = exports.connectToVPN = exports.getCharonErrorState = exports.getCurrentState = exports.connect = exports.VpnType = exports.prepare = exports.onStateChangedListener = exports.removeOnStateChangeListener = exports.STATE_CHANGED_EVENT_NAME = exports.CharonErrorState = exports.VpnState = void 0;
+exports.disconnect = exports.getShadowServerString = exports.getShadowType = exports.saveShadowType = exports.saveShadowServerString = exports.connectToVPN = exports.getCharonErrorState = exports.getCurrentState = exports.connect = exports.VpnType = exports.prepare = exports.onStateChangedListener = exports.removeOnStateChangeListener = exports.STATE_CHANGED_EVENT_NAME = exports.CharonErrorState = exports.VpnState = void 0;
 const react_native_1 = require("react-native");
 var VpnState;
 (function (VpnState) {
@@ -46,5 +46,7 @@ exports.disconnect = react_native_1.NativeModules.RNIpSecVpn.disconnect;
 exports.connectToVPN = (name, address, username, password, vpnType, secret, disconnectOnSleep, mtu, b64CaCert, b64UserCert, userCertPassword, certAlias) => react_native_1.NativeModules.RNIpSecVpn.connectToVPN(name || "", address || "", username || "", password || "", vpnType || "", secret || "", disconnectOnSleep || false, mtu || 1400, b64CaCert || "", b64UserCert || "", userCertPassword || "", certAlias || "");
 exports.getShadowServerString = () => react_native_1.NativeModules.RNIpSecVpn.getShadowServerString;
 exports.saveShadowServerString = (text) => react_native_1.NativeModules.RNIpSecVpn.saveShadowServerString(text || "");
+exports.saveShadowType = (type) => react_native_1.NativeModules.RNIpSecVpn.saveShadowType(type || 0);
+exports.getShadowType = () => react_native_1.NativeModules.RNIpSecVpn.getShadowType;
 exports.default = react_native_1.NativeModules.RNIpSecVpn;
 //# sourceMappingURL=index.js.map
