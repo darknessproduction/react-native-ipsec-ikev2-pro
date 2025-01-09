@@ -1,4 +1,5 @@
-import { EmitterSubscription } from "react-native";
+//import { EmitterSubscription } from "react-native";
+import EmitterSubscription from 'react-native/Libraries/vendor/emitter/EmitterSubscription';
 export declare enum VpnState {
     disconnected = 0,
     connecting = 1,
