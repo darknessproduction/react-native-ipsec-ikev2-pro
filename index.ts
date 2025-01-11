@@ -41,5 +41,6 @@ export declare const saveShadowServerString: (text: string) => Promise<void>;
 export declare const saveShadowType: (type: number) => Promise<void>;
 export declare const getShadowType: () => Promise<number>;
 export declare const saveTest: (name: string) => Promise<void>;
+export declare const isVpnConnected: () => Promise<boolean>;
 declare const _default: any;
 export default _default;

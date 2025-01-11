@@ -24,5 +24,6 @@ RCT_EXTERN_METHOD(saveShadowServerString:(NSString *)text resolver:(RCTPromiseRe
 RCT_EXTERN_METHOD(saveShadowType:(NSInteger)type resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter)
 RCT_EXTERN_METHOD(getShadowType:(RCTPromiseResolveBlock)findEventsWithResolver rejecter:(RCTPromiseRejectBlock)rejecter)
 RCT_EXTERN_METHOD(saveTest:(NSString *)name resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter)
+RCT_EXTERN_METHOD(isVpnConnected:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter)
 
 @end

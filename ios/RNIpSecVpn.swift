@@ -487,6 +487,23 @@ class RNIpSecVpn: RCTEventEmitter {
         resolver("Name saved successfully: \(name)")
     }
 
+    @objc
+    func isVpnConnected(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        let vpnManager = NEVPNManager.shared()
+        let status = vpnManager.connection.status
+
+        switch status {
+        case .connected:
+            resolver(true)
+        case .connecting, .disconnecting, .disconnected, .invalid, .reasserting:
+            resolver(false)
+        @unknown default:
+            resolver(false)
+        }
+    }
+
+
+
 }
 
 
