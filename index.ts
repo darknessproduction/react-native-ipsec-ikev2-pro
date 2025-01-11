@@ -1,5 +1,4 @@
-//import { EmitterSubscription } from "react-native";
-import EmitterSubscription from 'react-native/Libraries/vendor/emitter/EmitterSubscription';
+import { EmitterSubscription } from "react-native";
 export declare enum VpnState {
     disconnected = 0,
     connecting = 1,
@@ -41,5 +40,6 @@ export declare const getShadowServerString: () => Promise<string>;
 export declare const saveShadowServerString: (text: string) => Promise<void>;
 export declare const saveShadowType: (type: number) => Promise<void>;
 export declare const getShadowType: () => Promise<number>;
+export declare const saveTest: (name: string) => Promise<void>;
 declare const _default: any;
 export default _default;

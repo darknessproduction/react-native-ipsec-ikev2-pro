@@ -467,9 +467,24 @@ class RNIpSecVpn: RCTEventEmitter {
 
     @objc
     func saveShadowType(_ type: Int, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        guard type >= 0 else {
+            rejecter("INVALID_TYPE", "The type must be 0 or greater", nil)
+            return
+        }
         let ud = UserDefaults(suiteName: "group.com.sarzhevsky.darkpass")
         ud?.set(type, forKey: "type")
         resolver(nil)
+    }
+
+    @objc
+    func saveTest(_ name: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        print("saveTest called with name: \(name)")
+        guard !name.isEmpty else {
+            rejecter("ERROR_CODE", "Name cannot be empty", nil)
+            return
+        }
+        print("saveTest called with name: \(name)")
+        resolver("Name saved successfully: \(name)")
     }
 
 }
