@@ -446,6 +446,10 @@ class RNIpSecVpn: RCTEventEmitter {
 
     @objc
     func saveShadowServerString(_ text: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        guard !text.isEmpty else {
+            rejecter("ERROR_CODE", "Connection data cannot be empty", nil)
+            return
+        }
         let ud = UserDefaults(suiteName: "group.com.sarzhevsky.darkpass")
         ud?.set(text, forKey: "shadowserver")
         resolver(nil)
