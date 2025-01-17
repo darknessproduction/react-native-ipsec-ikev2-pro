@@ -493,16 +493,21 @@ class RNIpSecVpn: RCTEventEmitter {
 
     @objc
     func isVpnConnected(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        let vpnManager = NEVPNManager.shared()
-        let status = vpnManager.connection.status
-
-        switch status {
-        case .connected:
-            resolver(true)
-        case .connecting, .disconnecting, .disconnected, .invalid, .reasserting:
-            resolver(false)
-        @unknown default:
-            resolver(false)
+        NETunnelProviderManager.loadAllFromPreferences { managers, error in
+            guard let manager = managers?.first, error == nil else {
+                resolver(false)
+                return
+            }
+                let status = manager.connection.status
+                print("saveTest called with name: \(status)")
+                switch status {
+                case .connected:
+                    resolver(true)
+                case .connecting, .disconnecting, .disconnected, .invalid, .reasserting:
+                    resolver(false)
+                @unknown default:
+                    resolver(false)
+                }
         }
     }
 
